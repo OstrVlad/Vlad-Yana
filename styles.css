@@ -2222,6 +2222,13 @@ body::before {
     z-index: 10001; /* Sit on top */
     left: 0;
     top: 0;
+    width: 100%; /* Full /* Personalized Invitation Modal Styles */
+#personalized-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 10001; /* Sit on top */
+    left: 0;
+    top: 0;
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
@@ -2232,7 +2239,7 @@ body::before {
 }
 
 #personalized-modal .modal-content {
-    background-color: #fefefe;
+    background-color: var(--primary-beige); /* Используем основной бежевый цвет сайта */
     margin: 10% auto; /* 10% from the top and centered */
     padding: 40px;
     border-radius: 20px;
@@ -2266,19 +2273,26 @@ body::before {
     font-family: var(--font-heading);
     font-size: 2.2rem;
     color: var(--accent-brown);
-    margin-bottom: 20px;
+    margin-bottom: 15px; /* Уменьшаем отступ */
 }
 
 #personalized-modal-text {
     font-size: 1.1rem;
     line-height: 1.6;
     color: var(--text-dark);
+    margin-bottom: 10px; /* Уменьшаем отступ */
+}
+
+.modal-additional-text {
+    font-size: 1rem;
+    color: var(--text-light);
     margin-bottom: 30px;
+    line-height: 1.5;
 }
 
 .modal-button {
     background: linear-gradient(135deg, var(--accent-brown), var(--light-pink));
-    color: white;
+    color: var(--white);
     padding: 12px 30px;
     border: none;
     border-radius: 25px;
@@ -2316,5 +2330,3 @@ body::before {
         font-size: 1rem;
     }
 }
-
-
