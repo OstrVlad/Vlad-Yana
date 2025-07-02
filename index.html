@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Влад & Яна - Приглашение на свадьбу</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-content">
+            <div class="heart-loader">
+                <div class="heart"></div>
+                <div class="heart"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <header id="hero" class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+
+            <div class="couple-names">
+                <span class="name">Влад</span>
+                <span class="ampersand">&</span>
+                <span class="name">Яна</span>
+            </div>
+            <div class="wedding-date">1 Августа 2025 года</div>
+            
+            <!-- Countdown Timer -->
+            <div class="countdown-container">
+                <div class="countdown-timer" id="countdown">
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="days">0</span>
+                        <span class="countdown-label">дней</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="hours">0</span>
+                        <span class="countdown-label">часов</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="minutes">0</span>
+                        <span class="countdown-label">минут</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-number" id="seconds">0</span>
+                        <span class="countdown-label">секунд</span>
+                    </div>
+                </div>
+                <div class="countdown-message">до нашей свадьбы</div>
+                
+                <!-- Calendar reminder -->
+                <div class="calendar-reminder">
+                    <button class="calendar-btn" onclick="addToCalendar()">
+                        📅 Добавить в календарь
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-arrow"></div>
+        </div>
+    </header>
+
+
+
+    <!-- Date & Time Section -->
+    <section id="datetime" class="datetime-section">
+        <div class="container">
+            <h2 class="section-title">Дата и время</h2>
+            <div class="datetime-elegant-card">
+                <div class="datetime-header">
+                    <div class="date-display">
+                        <span class="date-number">1</span>
+                        <span class="date-month">Августа</span>
+                        <span class="date-year">2025 года</span>
+                    </div>
+                </div>
+                
+                <div class="datetime-timeline">
+                    <div class="timeline-event">
+                        <div class="event-time">13:50</div>
+                        <div class="event-details">
+                            <h3>Регистрация брака</h3>
+                            <p>ЗАГС Центрального района<br>ул. Площадь Ленина, д. 11</p>
+                        </div>
+                        <div class="event-icon">💒</div>
+                    </div>
+                    
+                    <div class="timeline-event">
+                        <div class="event-time">16:00</div>
+                        <div class="event-details">
+                            <h3>Банкет</h3>
+                            <p>Event-пространство «Купол на Крыше»<br>ул. Героев Красной Армии, д. 6</p>
+                        </div>
+                        <div class="event-icon">🍽️</div>
+                    </div>
+                </div>
+                
+                <div class="datetime-footer">
+                    <p class="dress-code-note">Dress-код: <strong>Торжественный</strong></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reception Section -->
+    <section id="reception" class="reception-section">
+        <div class="reception-overlay"></div>
+        <div class="container">
+            <h2 class="section-title">После регистрации приглашаем Вас на банкет</h2>
+            <div class="reception-content">
+                <div class="reception-info">
+                    <div class="reception-icon">🍽️</div>
+                    <h3>Event-пространство «Купол на Крыше»</h3>
+                    <p>ул. Героев Красной Армии, д. 6</p>
+                    <p class="reception-time">Начало банкета в 16:00</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Location Section -->
+    <section id="location" class="location-section">
+        <div class="container">
+            <h2 class="section-title">Как добраться</h2>
+            <div class="location-content">
+                <div class="location-info">
+                    <div class="location-item">
+                        <h3>ЗАГС Центрального района</h3>
+                        <p>ул. Площадь Ленина, д. 11</p>
+                        <p>🚗 Парковка доступна</p>
+                    </div>
+                    <div class="location-item">
+                        <h3>Event-пространство «Купол на Крыше»</h3>
+                        <p>ул. Героев Красной Армии, д. 6</p>
+                        <p>🚗 Парковка доступна</p>
+                    </div>
+                </div>
+                
+                <!-- Google Maps будет добавлена через JavaScript -->
+                <div class="map-container">
+                    <div id="map" class="map-placeholder">
+                        <p>Карта загружается...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program Section -->
+    <section id="program" class="program-section">
+        <div class="container">
+            <h2 class="section-title">Программа мероприятия</h2>
+            <div class="program-timeline">
+                <div class="timeline-item">
+                    <div class="timeline-time">13:40</div>
+                    <div class="timeline-content">
+                        <h3>Встреча гостей</h3>
+                        <p> у ЗАГСа Центрального района</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">13:50</div>
+                    <div class="timeline-content">
+                        <h3>Церемония бракосочетания</h3>
+                        <p>Официальная регистрация брака</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">14:20</div>
+                    <div class="timeline-content">
+                        <h3>Фотосессия</h3>
+                        <p>Совместные фотографии с гостями</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">16:00</div>
+                    <div class="timeline-content">
+                        <h3>Банкет</h3>
+                        <p>Праздничный ужин в Event-пространстве «Купол на Крыше»</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-time">23:00</div>
+                    <div class="timeline-content">
+                        <h3>Финал</h3>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dress Code Section -->
+    <section id="dresscode" class="dresscode-section">
+        <div class="container">
+            <h2 class="section-title">Dress-код</h2>
+            <div class="dresscode-content">
+                <div class="dresscode-main">
+                    <div class="dresscode-icon">👗</div>
+                    <h3>Торжественный</h3>
+                    <p class="dresscode-description">
+                        На нашей свадьбе действует торжественный dress-код! Приходите в любимом стиле. 
+                        Главное - Ваше хорошее настроение и улыбка!
+                    </p>
+                </div>
+                
+                <div class="dresscode-tips">
+                    <div class="dresscode-tip">
+                        <div class="tip-icon">🌈</div>
+                        <div class="tip-content">
+                            <h4>Цвета</h4>
+                            <p>Любые цвета приветствуются! Не стесняйтесь быть яркими.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="dresscode-tip">
+                        <div class="tip-icon">👠</div>
+                        <div class="tip-content">
+                            <h4>Обувь</h4>
+                            <p>Удобная обувь - лучший выбор. Будем много танцевать!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Weather Section -->
+    <section id="weather" class="weather-section">
+        <div class="container">
+            <h2 class="section-title">Прогноз погоды</h2>
+            <div class="weather-content">
+                <div class="weather-intro">
+                    <p>Проверьте прогноз погоды на день нашей свадьбы!</p>
+                </div>
+                
+                <div class="weather-widget">
+                    <div class="weather-loading" id="weather-loading">
+                        <div class="weather-spinner"></div>
+                        <p>Загружаем прогноз погоды...</p>
+                    </div>
+                    
+                    <div class="weather-data" id="weather-data" style="display: none;">
+                        <div class="weather-main">
+                            <div class="weather-icon" id="weather-icon">☀️</div>
+                            <div class="weather-temp">
+                                <span id="weather-temp">--</span>°C
+                            </div>
+                            <div class="weather-desc" id="weather-desc">--</div>
+                        </div>
+                        
+                        <div class="weather-details">
+                            <div class="weather-detail">
+                                <span class="detail-label">Ощущается как:</span>
+                                <span class="detail-value" id="feels-like">--°C</span>
+                            </div>
+                            <div class="weather-detail">
+                                <span class="detail-label">Влажность:</span>
+                                <span class="detail-value" id="humidity">--%</span>
+                            </div>
+                            <div class="weather-detail">
+                                <span class="detail-label">Ветер:</span>
+                                <span class="detail-value" id="wind">-- м/с</span>
+                            </div>
+                            <div class="weather-detail">
+                                <span class="detail-label">Давление:</span>
+                                <span class="detail-value" id="pressure">-- мм рт.ст.</span>
+                            </div>
+                        </div>
+                        
+                        <div class="weather-recommendation" id="weather-recommendation">
+                            
+                            <p id="clothing-advice">Загружаем рекомендации...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="weather-error" id="weather-error" style="display: none;">
+                        <p>Не удалось загрузить прогноз погоды. Пожалуйста, проверьте прогноз самостоятельно.</p>
+                        <a href="https://yandex.ru/pogoda/" target="_blank" class="weather-link">
+                            Открыть Яндекс.Погоду
+                        </a>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq-section">
+        <div class="container">
+            <h2 class="section-title">Часто задаваемые вопросы</h2>
+            <div class="faq-content">
+                
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h3>Будет ли парковочное место?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Да, и у ЗАГСа, и у ресторана есть парковочные места. 
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h3>Что делать, если я не смогу прийти?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Мы понимаем, что не все смогут присутствовать. Просим предупредить заранее.
+                             Мы будем скучать по Вам!</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h3>Если имеются особые требования к меню?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>В меню будут блюда разных предпочтений. Если у Вас есть 
+                        аллергии или особые требования, сообщите нам.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h3>Можно ли фотографировать во время церемонии?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Да, фотографируйте на память! Мы также будем рады, если вы 
+                        поделитесь своими фотографиями с нами.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <h3>До какого времени продлится банкет?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Банкет начнется в 16:00 и продлится до 23:00!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+
+    <!-- Gifts Section -->
+    <section id="gifts" class="gifts-section">
+        <div class="container">
+            <h2 class="section-title">Подарки</h2>
+            <div class="gifts-content">
+                <div class="gifts-text">
+                    <p>
+                        Самый ценный подарок для нас – это Ваше присутствие! 
+                        Если Вы хотите сделать подарок, мы будем рады и благодарны Вам.
+                    </p>
+                </div>
+                <div class="gifts-icon">🎁</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-names">
+                    <h3>Влад & Яна</h3>
+                </div>
+                <div class="footer-contacts">
+                    <p>📞 +7 (920) 217-23-57 (Влад)</p>
+                    <p>📞 +7 (920) 457-75-57 (Яна)</p>
+                    <p>📧 Ostretsov123@gmail.com</p>
+                </div>
+                <div class="footer-copyright">
+                    <p>&copy; 2025 Влад & Яна. Сделано с любовью ❤️</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+    
+    <!-- Яндекс.Карты API -->
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=YOUR_YANDEX_API_KEY&lang=ru_RU" type="text/javascript"></script>
+</body>
+</html>
+
+
+
+<!-- Personalized Invitation Modal -->
+<div id="personalized-modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h2 id="personalized-modal-title">Дорогой гость!</h2>
+        <p id="personalized-modal-text"></p>
+        <button class="modal-button" onclick="closePersonalizedModal()">Понятно</button>
+    </div>
+</div>
+
+
