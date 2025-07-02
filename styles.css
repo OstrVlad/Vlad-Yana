@@ -7,7 +7,7 @@ body {
     position: relative;
 }
 
-bbody::before {
+body::before {
     content: "";
     position: fixed;
     top: 0;
