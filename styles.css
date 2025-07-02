@@ -1,1086 +1,2312 @@
-// ===== PRELOADER =====
-window.addEventListener('load', function() {
-    const preloader = document.getElementById('preloader');
-    setTimeout(() => {
-        preloader.style.opacity = '0';
-        preloader.style.visibility = 'hidden';
-        setTimeout(() => {
-            preloader.style.display = 'none';
-        }, 500);
-    }, 1000); // Показываем preloader минимум 1 секунду
-});
-
-// ===== SMOOTH SCROLLING =====
-document.addEventListener('DOMContentLoaded', function() {
-    // Плавная прокрутка для всех якорных ссылок
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-});
-
-// ===== SCROLL REVEAL ANIMATIONS =====
-function revealOnScroll() {
-    const reveals = document.querySelectorAll('.reveal');
-    
-    reveals.forEach(element => {
-        const windowHeight = window.innerHeight;
-        const elementTop = element.getBoundingClientRect().top;
-        const elementVisible = 150;
-        
-        if (elementTop < windowHeight - elementVisible) {
-            element.classList.add('active');
-        }
-    });
+body {
+    font-family: 'Open Sans', sans-serif;
+    line-height: 1.6;
+    color: #4a4a4a;
+    background-color: #ffffff; /* Чисто белый фон */
+    overflow-x: hidden;
+    position: relative;
 }
 
-// Добавляем класс reveal к элементам при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    // Добавляем класс reveal к секциям
-    const sections = document.querySelectorAll('section');
-    sections.forEach(section => {
-        section.classList.add('reveal');
-    });
-    
-    // Добавляем класс reveal к элементам внутри секций
-    const revealElements = document.querySelectorAll('.datetime-item, .location-item, .gifts-content, .about-content');
-    revealElements.forEach(element => {
-        element.classList.add('reveal');
-    });
-    
-    // Запускаем проверку при загрузке
-    revealOnScroll();
-});
-
-// Слушаем событие прокрутки
-window.addEventListener('scroll', revealOnScroll);
-
-// ===== FORM VALIDATION & SUBMISSION =====
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('rsvp-form');
-    const successMessage = document.getElementById('form-success');
-    const errorMessage = document.getElementById('form-error');
-    
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Валидация формы
-            if (validateForm()) {
-                submitForm();
-            }
-        });
-    }
-    
-    function validateForm() {
-        const name = document.getElementById('name').value.trim();
-        const contact = document.getElementById('contact').value.trim();
-        
-        // Проверяем обязательные поля
-        if (!name) {
-            showError('Пожалуйста, введите ваше имя');
-            return false;
-        }
-        
-        if (!contact) {
-            showError('Пожалуйста, введите email или телефон');
-            return false;
-        }
-        
-        // Проверяем формат email или телефона
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/;
-        
-        if (!emailRegex.test(contact) && !phoneRegex.test(contact)) {
-            showError('Пожалуйста, введите корректный email или номер телефона');
-            return false;
-        }
-        
-        return true;
-    }
-    
-    function submitForm() {
-        const formData = new FormData(form);
-        
-        // Показываем индикатор загрузки
-        const submitButton = form.querySelector('.submit-button');
-        const originalText = submitButton.textContent;
-        submitButton.textContent = 'Отправляем...';
-        submitButton.disabled = true;
-        
-        // Отправляем форму через Formspree
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                showSuccess();
-                form.reset();
-            } else {
-                throw new Error('Ошибка отправки');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showError('Произошла ошибка при отправке. Пожалуйста, попробуйте еще раз.');
-        })
-        .finally(() => {
-            // Восстанавливаем кнопку
-            submitButton.textContent = originalText;
-            submitButton.disabled = false;
-        });
-    }
-    
-    function showSuccess() {
-        hideMessages();
-        successMessage.style.display = 'block';
-        successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        
-        // Скрываем сообщение через 5 секунд
-        setTimeout(() => {
-            successMessage.style.display = 'none';
-        }, 5000);
-    }
-    
-    function showError(message) {
-        hideMessages();
-        errorMessage.querySelector('p').textContent = message;
-        errorMessage.style.display = 'block';
-        errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        
-        // Скрываем сообщение через 5 секунд
-        setTimeout(() => {
-            errorMessage.style.display = 'none';
-        }, 5000);
-    }
-    
-    function hideMessages() {
-        successMessage.style.display = 'none';
-        errorMessage.style.display = 'none';
-    }
-});
-
-// ===== ЯНДЕКС.КАРТЫ =====
-function initYandexMap() {
-    ymaps.ready(function () {
-        // Координаты ЗАГСа и ресторана (замените на реальные)
-        const zagsCoords = [51.662951, 39.203001]; // Москва, Красная площадь (пример)
-        const restaurantCoords = [51.689114, 39.221182]; // Москва, ГУМ (пример)
-        
-        // Создание карты
-        const myMap = new ymaps.Map('map', {
-            center: zagsCoords,
-            zoom: 13,
-            controls: ['zoomControl', 'fullscreenControl']
-        });
-
-        // Стиль карты
-        myMap.options.set('suppressMapOpenBlock', true);
-        
-        // Метка ЗАГСа
-        const zagsPlacemark = new ymaps.Placemark(zagsCoords, {
-            balloonContent: '<strong>ЗАГС Центрального и Ленинского районов</strong><br>ул. Цветочная, д. 15<br>Время: 16:00',
-            hintContent: 'ЗАГС Центрального и Ленинского районов'
-        }, {
-            preset: 'islands#redHeartIcon',
-            iconColor: '#FF7F50'
-        });
-
-        // Метка ресторана
-        const restaurantPlacemark = new ymaps.Placemark(restaurantCoords, {
-            balloonContent: '<strong>Event-пространство «Купол на Крыше»</strong><br>ул. Набережная, д. 8<br>Время: 18:00',
-            hintContent: 'Event-пространство «Купол на Крыше»'
-        }, {
-            preset: 'islands#foodIcon',
-            iconColor: '#FF69B4'
-        });
-
-        // Добавление меток на карту
-        myMap.geoObjects.add(zagsPlacemark);
-        myMap.geoObjects.add(restaurantPlacemark);
-
-        // Автоматическое позиционирование карты для показа всех меток
-        myMap.setBounds(myMap.geoObjects.getBounds(), {
-            checkZoomRange: true,
-            zoomMargin: 120
-        });
-    });
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("./white_flowing_fabric.png") center/cover no-repeat;
+    background-size: cover;
+    opacity: 0.7; /* Увеличиваем прозрачность для максимальной выразительности */
+    z-index: -1;
+    animation: fabricFlow 8s ease-in-out infinite; /* Ускоряем анимацию */
 }
 
-// Инициализация Яндекс.Карт при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем, загружен ли API Яндекс.Карт
-    if (typeof ymaps !== 'undefined') {
-        initYandexMap();
-    } else {
-        // Если API еще не загружен, ждем его загрузки
-        const checkYmaps = setInterval(function() {
-            if (typeof ymaps !== 'undefined') {
-                clearInterval(checkYmaps);
-                initYandexMap();
-            }
-        }, 100);
-        
-        // Fallback если API не загрузится
-        setTimeout(function() {
-            if (typeof ymaps === 'undefined') {
-                const mapContainer = document.getElementById('map');
-                if (mapContainer) {
-                    mapContainer.innerHTML = `
-                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f5f0ec; color: #6b6b6b;">
-                            <div style="text-align: center;">
-                                <p>Карта временно недоступна</p>
-                                <p style="font-size: 0.9em;">Адреса указаны в разделе выше</p>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-        }, 5000);
+@keyframes flowingFabric {
+    0% {
+        background-position: 0% 50%;
     }
-});
-
-// ===== PARALLAX EFFECT =====
-window.addEventListener('scroll', function() {
-    const scrolled = window.pageYOffset;
-    const parallaxElements = document.querySelectorAll('.hero-section, .reception-section');
-    
-    parallaxElements.forEach(element => {
-        const speed = 0;
-        const yPos = -(scrolled * speed);
-        element.style.transform = `translateY(${yPos}px)`;
-    });
-});
-
-// ===== MOBILE MENU TOGGLE (если понадобится) =====
-function toggleMobileMenu() {
-    const menu = document.querySelector('.mobile-menu');
-    if (menu) {
-        menu.classList.toggle('active');
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
     }
 }
 
-// ===== UTILITY FUNCTIONS =====
-// Функция для анимации чисел (можно использовать для счетчиков)
-function animateNumber(element, start, end, duration) {
-    const startTime = performance.now();
-    
-    function updateNumber(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        const current = Math.floor(start + (end - start) * progress);
-        element.textContent = current;
-        
-        if (progress < 1) {
-            requestAnimationFrame(updateNumber);
-        }
+@keyframes fabricFlow {
+    0%, 100% {
+        transform: translateX(0) translateY(0) scale(1);
+        opacity: 0.7;
     }
-    
-    requestAnimationFrame(updateNumber);
-}
-
-// Функция для проверки видимости элемента
-function isElementInViewport(element) {
-    const rect = element.getBoundingClientRect();
-    return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
-}
-
-// ===== PERFORMANCE OPTIMIZATION =====
-// Throttle функция для оптимизации событий прокрутки
-function throttle(func, limit) {
-    let inThrottle;
-    return function() {
-        const args = arguments;
-        const context = this;
-        if (!inThrottle) {
-            func.apply(context, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-        }
+    25% {
+        transform: translateX(-30px) translateY(-20px) scale(1.08); /* Увеличиваем движение и масштаб */
+        opacity: 0.8;
+    }
+    50% {
+        transform: translateX(30px) translateY(20px) scale(1.07);
+        opacity: 0.75;
+    }
+    75% {
+        transform: translateX(-20px) translateY(30px) scale(1.09);
+        opacity: 0.85;
     }
 }
-
-// Применяем throttle к событию прокрутки
-window.addEventListener('scroll', throttle(revealOnScroll, 100));
-
-// ===== ACCESSIBILITY IMPROVEMENTS =====
-document.addEventListener('DOMContentLoaded', function() {
-    // Добавляем поддержку клавиатурной навигации
-    const focusableElements = document.querySelectorAll('a, button, input, select, textarea');
+/* ===== VARIABLES ===== */
+:root {
+    /* Colors */
+    --primary-beige: #f5f0ec;
+    --light-pink: #ffe5ec;
+    --lavender: #e6e6fa;
+    --light-blue: #e6f3ff;
+    --accent-brown: #d2b48c;
+    --text-dark: #4a4a4a;
+    --text-light: #6b6b6b;
+    --white: #ffffff;
+    --overlay: rgba(0, 0, 0, 0.4);
     
-    focusableElements.forEach(element => {
-        element.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && element.tagName === 'A') {
-                element.click();
-            }
-        });
-    });
+    /* Fonts */
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Open Sans', sans-serif;
     
-    // Улучшаем доступность формы
-    const form = document.getElementById('rsvp-form');
-    if (form) {
-        const inputs = form.querySelectorAll('input, select, textarea');
-        inputs.forEach(input => {
-            input.addEventListener('invalid', function() {
-                this.setAttribute('aria-invalid', 'true');
-            });
-            
-            input.addEventListener('input', function() {
-                if (this.validity.valid) {
-                    this.removeAttribute('aria-invalid');
-                }
-            });
-        });
-    }
-});
-
-console.log('Wedding invitation script loaded successfully! 💒💕');
-
-
-// ===== ENHANCED MODAL FUNCTIONALITY =====
-function createModal(title, content) {
-    // Удаляем существующий модал если есть
-    const existingModal = document.getElementById('dynamic-modal');
-    if (existingModal) {
-        existingModal.remove();
-    }
+    /* Spacing */
+    --section-padding: 80px 0;
+    --container-padding: 0 20px;
+    --border-radius: 12px;
     
-    // Создаем новый модал
-    const modal = document.createElement('div');
-    modal.id = 'dynamic-modal';
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <span class="modal-close">&times;</span>
-            <h2>${title}</h2>
-            <div class="modal-body">${content}</div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Показываем модал
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    
-    // Обработчики закрытия
-    const closeBtn = modal.querySelector('.modal-close');
-    closeBtn.onclick = () => closeModal(modal);
-    
-    modal.onclick = (e) => {
-        if (e.target === modal) {
-            closeModal(modal);
-        }
-    };
-    
-    // Закрытие по ESC
-    document.addEventListener('keydown', function escHandler(e) {
-        if (e.key === 'Escape') {
-            closeModal(modal);
-            document.removeEventListener('keydown', escHandler);
-        }
-    });
+    /* Transitions */
+    --transition: all 0.3s ease;
+    --transition-slow: all 0.6s ease;
 }
 
-function closeModal(modal) {
-    modal.style.animation = 'modalFadeOut 0.3s ease';
-    setTimeout(() => {
-        modal.remove();
-        document.body.style.overflow = 'auto';
-    }, 300);
+/* ===== PRELOADER ===== */
+#preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--light-pink), var(--lavender));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
-// ===== ENHANCED PHOTO GALLERY =====
-document.addEventListener('DOMContentLoaded', function() {
-    // Добавляем клики на фотографии для увеличения
-    const photos = document.querySelectorAll('.about-photo, .memory-photo');
-    photos.forEach(photo => {
-        photo.style.cursor = 'pointer';
-        photo.addEventListener('click', function() {
-            const title = this.alt || 'Фотография';
-            const content = `<img src="${this.src}" alt="${title}" style="width: 100%; border-radius: 10px;">`;
-            createModal(title, content);
-        });
-    });
-    
-    // Улучшенная анимация появления элементов
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('reveal');
-            }
-        });
-    }, observerOptions);
-    
-    // Наблюдаем за всеми анимируемыми элементами
-    const animatedElements = document.querySelectorAll(
-        '.photo-item, .memory-item, .timeline-item, .datetime-item, .location-item'
-    );
-    
-    animatedElements.forEach(el => {
-        observer.observe(el);
-    });
-});
-
-// ===== ENHANCED TIMELINE ANIMATION =====
-function animateTimeline() {
-    const timelineItems = document.querySelectorAll('.timeline-item');
-    timelineItems.forEach((item, index) => {
-        setTimeout(() => {
-            item.classList.add('reveal');
-        }, index * 200);
-    });
+.preloader-content {
+    text-align: center;
+    color: var(--text-dark);
 }
 
-// ===== ENHANCED SCROLL EFFECTS =====
-window.addEventListener('scroll', function() {
-    const scrolled = window.pageYOffset;
-    const rate = scrolled * -0.5;
-    
-    // Параллакс для hero секции
-    const heroSection = document.querySelector('.hero-section');
-    if (heroSection) {
-        heroSection.style.transform = `translateY(${rate}px)`;
-    }
-    
-    // Анимация появления timeline при прокрутке
-    const programSection = document.querySelector('.program-section');
-    if (programSection) {
-        const rect = programSection.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
-            const timelineItems = programSection.querySelectorAll('.timeline-item:not(.reveal)');
-            if (timelineItems.length > 0) {
-                animateTimeline();
-            }
-        }
-    }
-});
-
-// ===== ENHANCED FORM HANDLING =====
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('rsvp-form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Показываем индикатор загрузки
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Отправляем...';
-            submitBtn.disabled = true;
-            
-            // Отправляем форму
-            fetch(form.action, {
-                method: 'POST',
-                body: new FormData(form),
-                headers: {
-                    'Accept': 'application/json'
-                }
-            }).then(response => {
-                if (response.ok) {
-                    showSuccess('Спасибо! Мы получили ваш ответ.');
-                    form.reset();
-                } else {
-                    throw new Error('Ошибка отправки');
-                }
-            }).catch(error => {
-                showError('Произошла ошибка. Попробуйте еще раз.');
-            }).finally(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            });
-        });
-    }
-    
-    function showSuccess(message) {
-        createModal('Успешно!', `<p style="color: #4CAF50; text-align: center; font-size: 1.1rem;">${message}</p>`);
-    }
-    
-    function showError(message) {
-        createModal('Ошибка', `<p style="color: #f44336; text-align: center; font-size: 1.1rem;">${message}</p>`);
-    }
-});
-
-// ===== ENHANCED NAVIGATION =====
-document.addEventListener('DOMContentLoaded', function() {
-    // Плавная прокрутка для всех якорных ссылок
-    const links = document.querySelectorAll('a[href^="#"]');
-    links.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            
-            if (targetElement) {
-                const offsetTop = targetElement.offsetTop - 80; // Учитываем высоту навигации
-                window.scrollTo({
-                    top: offsetTop,
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-});
-
-console.log('Enhanced wedding invitation features loaded! 💒✨');
-
-
-// ===== COUNTDOWN TIMER =====
-function initCountdown() {
-    const weddingDate = new Date('2025-08-01T13:50:00').getTime();
-    
-    function updateCountdown() {
-        const now = new Date().getTime();
-        const distance = weddingDate - now;
-        
-        if (distance < 0) {
-            document.getElementById('countdown').innerHTML = '<div class="countdown-finished">Мы поженились! 💕</div>';
-            return;
-        }
-        
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        
-        document.getElementById('days').textContent = days;
-        document.getElementById('hours').textContent = hours;
-        document.getElementById('minutes').textContent = minutes;
-        document.getElementById('seconds').textContent = seconds;
-    }
-    
-    // Обновляем каждую секунду
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
+.heart-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-// ===== ADD TO CALENDAR =====
-function addToCalendar() {
-    const event = {
-        title: 'Свадьба Влада и Яны',
-        start: '20250801T135000',
-        end: '20250801T220000',
-        description: 'Церемония бракосочетания и банкет',
-        location: 'ЗАГС Центрального района, ул. Площадь Ленина, д. 11'
-    };
-    
-    // Google Calendar URL
-    const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${event.start}/${event.end}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}`;
-    
-    // Outlook URL
-    const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(event.title)}&startdt=${event.start}&enddt=${event.end}&body=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}`;
-    
-    // Создаем модальное окно с выбором календаря
-    const modal = document.createElement('div');
-    modal.className = 'calendar-modal';
-    modal.innerHTML = `
-        <div class="calendar-modal-content">
-            <h3>Выберите календарь</h3>
-            <div class="calendar-options">
-                <a href="${googleUrl}" target="_blank" class="calendar-option">
-                    📅 Google Calendar
-                </a>
-                <a href="${outlookUrl}" target="_blank" class="calendar-option">
-                    📅 Outlook
-                </a>
-                <button onclick="downloadICS()" class="calendar-option">
-                    📅 Скачать .ics файл
-                </button>
-            </div>
-            <button onclick="closeCalendarModal()" class="close-modal">Закрыть</button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    modal.style.display = 'flex';
+.heart {
+    width: 20px;
+    height: 20px;
+    background: var(--accent-brown);
+    position: relative;
+    transform: rotate(-45deg);
+    animation: heartbeat 1.5s ease-in-out infinite;
+    margin: 0 5px;
 }
 
-function downloadICS() {
-    const icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Wedding//Wedding Invitation//EN
-BEGIN:VEVENT
-UID:wedding-vlad-yana-2025@example.com
-DTSTAMP:20250609T120000Z
-DTSTART:20250801T135000
-DTEND:20250801T220000
-SUMMARY:Свадьба Влада и Яны
-DESCRIPTION:Церемония бракосочетания и банкет
-LOCATION:ЗАГС Центрального района, ул. Площадь Ленина, д. 11
-END:VEVENT
-END:VCALENDAR`;
-    
-    const blob = new Blob([icsContent], { type: 'text/calendar' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'wedding-vlad-yana.ics';
-    a.click();
-    window.URL.revokeObjectURL(url);
-    closeCalendarModal();
+.heart:before,
+.heart:after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: 10px;
+    top: 0;
+    background: var(--accent-brown);
+    border-radius: 10px;
+    transform: rotate(-45deg);
+    transform-origin: 0 10px;
 }
 
-function closeCalendarModal() {
-    const modal = document.querySelector('.calendar-modal');
-    if (modal) {
-        modal.remove();
+.heart:after {
+    left: 0;
+    transform: rotate(45deg);
+    transform-origin: 10px 10px;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: rotate(-45deg) scale(1); }
+    50% { transform: rotate(-45deg) scale(1.2); }
+}
+
+/* ===== UTILITY CLASSES ===== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--container-padding);
+}
+
+.section-title {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--text-dark);
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-brown), var(--light-pink));
+    border-radius: 2px;
+}
+
+/* ===== HERO SECTION ===== */
+.hero-section {
+    height: 100vh;
+    background: linear-gradient(var(--overlay), var(--overlay)), 
+                url('images/hero.jpg') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--white);
+    position: relative;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    animation: fadeInUp 1s ease-out;
+}
+
+.hero-title {
+    font-family: var(--font-heading);
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.couple-names {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.ampersand {
+    font-size: 2rem;
+    opacity: 0.8;
+}
+
+.wedding-date {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 15px 40px;
+    background: linear-gradient(135deg, var(--accent-brown), var(--light-pink));
+    color: var(--white);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s infinite;
+}
+
+.scroll-arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid var(--white);
+    border-bottom: 2px solid var(--white);
+    transform: rotate(45deg);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-// Инициализируем countdown при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    initCountdown();
-});
-
-
-// ===== FAQ FUNCTIONALITY =====
-function toggleFAQ(element) {
-    const faqItem = element.parentElement;
-    const answer = faqItem.querySelector('.faq-answer');
-    const toggle = element.querySelector('.faq-toggle');
-    
-    // Закрываем все остальные FAQ
-    document.querySelectorAll('.faq-item').forEach(item => {
-        if (item !== faqItem) {
-            item.classList.remove('active');
-            item.querySelector('.faq-answer').classList.remove('active');
-        }
-    });
-    
-    // Переключаем текущий FAQ
-    faqItem.classList.toggle('active');
-    answer.classList.toggle('active');
-}
-
-
-// ===== WEATHER FUNCTIONALITY =====
-async function loadWeather() {
-    const weatherLoading = document.getElementById('weather-loading');
-    const weatherData = document.getElementById('weather-data');
-    const weatherError = document.getElementById('weather-error');
-    
-    try {
-        // Показываем демо данные для 1 августа 2025 года
-        // В реальном проекте здесь можно использовать API для долгосрочного прогноза
-        showWeddingDayWeather();
-        
-    } catch (error) {
-        console.error('Weather loading error:', error);
-        showWeddingDayWeather(); // Показываем демо данные при ошибке
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+    40% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+    60% {
+        transform: translateX(-50%) translateY(-5px);
     }
 }
 
-function showWeddingDayWeather() {
-    // Прогноз погоды на 1 августа 2025 года (демо данные)
-    const weddingDayData = {
-        main: {
-            temp: 24,
-            feels_like: 26,
-            humidity: 58,
-            pressure: 1018
-        },
-        weather: [{
-            main: 'Clear',
-            description: 'ясно',
-            icon: '01d'
-        }],
-        wind: {
-            speed: 2.8
-        }
-    };
-    
-    displayWeather(weddingDayData, true);
+/* ===== ABOUT SECTION ===== */
+.about-section {
+    padding: var(--section-padding);
+    background: var(--white);
 }
 
-function displayWeather(data, isWeddingDay = false) {
-    const weatherLoading = document.getElementById('weather-loading');
-    const weatherData = document.getElementById('weather-data');
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.about-text {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    color: var(--text-light);
+}
+
+.love-quote {
+    background: var(--light-pink);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--accent-brown);
+}
+
+.love-quote blockquote {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-style: italic;
+    color: var(--text-dark);
+}
+
+/* ===== DATE & TIME SECTION ===== */
+.datetime-section {
+    padding: var(--section-padding);
+    backdrop-filter: blur(1px);
+}
+
+.datetime-elegant-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.datetime-header {
+    background: linear-gradient(135deg, var(--light-pink), var(--lavender));
+    padding: 40px 30px;
+    text-align: center;
+    position: relative;
+}
+
+.datetime-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("./white_flowing_fabric.png") center/cover no-repeat;
+    opacity: 0.1;
+    animation: fabricFlow 20s ease-in-out infinite;
+}
+
+.date-display {
+    position: relative;
+    z-index: 2;
+}
+
+.date-number {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--accent-brown);
+    line-height: 1;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.date-month {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+}
+
+.date-year {
+    display: block;
+    font-size: 1.2rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.datetime-timeline {
+    padding: 40px 30px;
+}
+
+.timeline-event {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    padding: 25px 0;
+    position: relative;
+}
+
+.timeline-event:not(:last-child) {
+    border-bottom: 1px solid rgba(210, 180, 140, 0.2);
+}
+
+.timeline-event:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-brown), transparent);
+}
+
+.event-time {
+    background: linear-gradient(135deg, var(--accent-brown), #c19a6b);
+    color: var(--white);
+    padding: 15px 20px;
+    border-radius: 15px;
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    font-weight: 700;
+    min-width: 100px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(210, 180, 140, 0.3);
+}
+
+.event-details {
+    flex: 1;
+}
+
+.event-details h3 {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.event-details p {
+    color: var(--text-light);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.event-icon {
+    font-size: 2.5rem;
+    opacity: 0.8;
+}
+
+.datetime-footer {
+    background: rgba(230, 230, 250, 0.5);
+    padding: 25px 30px;
+    text-align: center;
+    border-top: 1px solid rgba(210, 180, 140, 0.2);
+}
+
+.dress-code-note {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+}
+
+.dress-code-note strong {
+    color: var(--accent-brown);
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .datetime-elegant-card {
+        margin: 0 15px;
+    }
     
-    // Скрываем загрузку, показываем данные
-    weatherLoading.style.display = 'none';
-    weatherData.style.display = 'block';
+    .datetime-header {
+        padding: 30px 20px;
+    }
     
-    // Заполняем данные
-    document.getElementById('weather-temp').textContent = Math.round(data.main.temp);
-    document.getElementById('weather-desc').textContent = data.weather[0].description;
-    document.getElementById('feels-like').textContent = Math.round(data.main.feels_like) + '°C';
-    document.getElementById('humidity').textContent = data.main.humidity + '%';
-    document.getElementById('wind').textContent = data.wind.speed + ' м/с';
-    document.getElementById('pressure').textContent = Math.round(data.main.pressure * 0.75) + ' мм рт.ст.';
+    .date-number {
+        font-size: 3rem;
+    }
     
-    // Устанавливаем иконку погоды
-    const weatherIcon = document.getElementById('weather-icon');
-    const iconMap = {
-        'Clear': '☀️',
-        'Clouds': '☁️',
-        'Rain': '🌧️',
-        'Snow': '❄️',
-        'Thunderstorm': '⛈️',
-        'Drizzle': '🌦️',
-        'Mist': '🌫️',
-        'Fog': '🌫️'
-    };
-    weatherIcon.textContent = iconMap[data.weather[0].main] || '🌤️';
+    .date-month {
+        font-size: 1.5rem;
+    }
     
-    // Генерируем рекомендации по одежде
-    generateClothingAdvice(data.main.temp, data.weather[0].main);
+    .datetime-timeline {
+        padding: 30px 20px;
+    }
     
-    if (isWeddingDay) {
-        // Добавляем пометку о прогнозе на день свадьбы
-        const weddingNote = document.createElement('div');
-        weddingNote.style.cssText = 'margin-top: 15px; padding: 15px; background: rgba(255, 193, 7, 0.15); border-radius: 12px; font-size: 0.95rem; color: #856404; border-left: 4px solid #ffc107;';
-        weddingNote.innerHTML = '📅 <strong>Прогноз на 1 августа 2025 года</strong><br>Данные основаны на климатических условиях региона для этого времени года.';
-        weatherData.appendChild(weddingNote);
+    .timeline-event {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .event-time {
+        order: 1;
+        min-width: auto;
+        padding: 12px 18px;
+        font-size: 1.2rem;
+    }
+    
+    .event-details {
+        order: 2;
+    }
+    
+    .event-icon {
+        order: 3;
+        font-size: 2rem;
+    }
+    
+    .datetime-footer {
+        padding: 20px;
     }
 }
 
-function generateClothingAdvice(temp, condition) {
-    const adviceElement = document.getElementById('clothing-advice');
-    let advice = '';
+/* ===== RECEPTION SECTION ===== */
+.reception-section {
+    padding: var(--section-padding);
+    background: linear-gradient(var(--overlay), var(--overlay)), 
+                url('images/reception.jpg') center/cover no-repeat;
+    color: var(--white);
+    text-align: center;
+    position: relative;
+}
+
+.reception-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     
-    if (temp < 0) {
-        advice = 'Очень холодно! Теплая зимняя одежда, шапка, перчатки, теплая обувь.';
-    } else if (temp < 10) {
-        advice = 'Прохладно. Куртка или пальто, закрытая обувь, возможно шарф.';
-    } else if (temp < 20) {
-        advice = 'Умеренно тепло. Легкая куртка или кардиган, удобная обувь.';
-    } else if (temp < 25) {
-        advice = 'Комфортная температура. Легкая одежда, можно без куртки.';
-    } else {
-        advice = 'Тепло! Легкая летняя одежда, солнцезащитные очки.';
+}
+
+.reception-content {
+    position: relative;
+    z-index: 2;
+}
+
+.reception-info {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 3rem;
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(255, 255, 255, 1.5);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.reception-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.reception-info h3 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.reception-info p {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.reception-time {
+    font-weight: 600;
+    font-size: 1.3rem !important;
+    margin-top: 1rem !important;
+}
+
+/* ===== RSVP SECTION ===== */
+.rsvp-section {
+    padding: var(--section-padding);
+    background: var(--white);
+}
+
+.rsvp-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.rsvp-description {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
+    color: var(--text-light);
+}
+
+.rsvp-form {
+    background: var(--light-blue);
+    padding: 3rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: var(--transition);
+    background: var(--white);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent-brown);
+    box-shadow: 0 0 0 3px rgba(210, 180, 140, 0.2);
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.radio-label input[type="radio"] {
+    display: none;
+}
+
+.radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--accent-brown);
+    border-radius: 50%;
+    margin-right: 10px;
+    position: relative;
+    transition: var(--transition);
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: var(--accent-brown);
+    border-radius: 50%;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--accent-brown), var(--light-pink));
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.form-message {
+    text-align: center;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    margin-top: 2rem;
+}
+
+.form-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.form-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* ===== LOCATION SECTION ===== */
+.location-section {
+    padding: var(--section-padding);
+    background: var(--primary-beige);
+}
+
+.location-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+.location-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.location-item {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 1.5);
+}
+
+.location-item h3 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+}
+
+.location-item p {
+    margin-bottom: 0.5rem;
+    color: var(--text-light);
+}
+
+.map-container {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 1.5);
+}
+
+.map-placeholder {
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--light-blue);
+    color: var(--text-light);
+}
+
+#map {
+    height: 500px;
+    width: 450px;
+}
+
+/* ===== GIFTS SECTION ===== */
+.gifts-section {
+    padding: var(--section-padding);
+    background: var(--light-pink);
+}
+
+.gifts-content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3rem;
+    align-items: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.gifts-text p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    color: var(--text-light);
+}
+
+.gifts-icon {
+    font-size: 6rem;
+    opacity: 0.7;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    background: var(--text-dark);
+    color: var(--white);
+    padding: 3rem 0 2rem;
+}
+
+.footer-content {
+    text-align: center;
+}
+
+.footer-names h3 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.footer-contacts {
+    margin-bottom: 2rem;
+}
+
+.footer-contacts p {
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+}
+
+.footer-copyright {
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    opacity: 0.7;
+}
+
+/* ===== SCROLL REVEAL ANIMATIONS ===== */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: var(--transition-slow);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    :root {
+        --section-padding: 60px 0;
     }
     
-    // Добавляем рекомендации по погодным условиям
-    if (condition === 'Rain' || condition === 'Drizzle') {
-        advice += ' Не забудьте зонт и непромокаемую обувь!';
-    } else if (condition === 'Snow') {
-        advice += ' Осторожно, возможна скользкая дорога!';
-    } else if (condition === 'Clear' && temp > 20) {
-        advice += ' Отличная погода для фотосессии на улице!';
+    .hero-title {
+        font-size: 2.5rem;
     }
     
-    adviceElement.textContent = advice;
-}
-
-// Инициализируем погоду при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    // Загружаем погоду с небольшой задержкой для лучшего UX
-    setTimeout(loadWeather, 1000);
-});
-
-
-// ===== GUEST PHOTOS FUNCTIONALITY =====
-document.addEventListener('DOMContentLoaded', function() {
-    initPhotoUpload();
-    initGuestGallery();
-});
-
-function initPhotoUpload() {
-    const uploadArea = document.getElementById('upload-area');
-    const photoInput = document.getElementById('photo-input');
-    const uploadProgress = document.getElementById('upload-progress');
-    const uploadSuccess = document.getElementById('upload-success');
-    
-    // Drag and drop functionality
-    uploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
-    
-    uploadArea.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-    });
-    
-    uploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-        const files = e.dataTransfer.files;
-        handleFileUpload(files);
-    });
-    
-    // File input change
-    photoInput.addEventListener('change', function(e) {
-        const files = e.target.files;
-        handleFileUpload(files);
-    });
-    
-    // Click to upload
-    uploadArea.addEventListener('click', function() {
-        photoInput.click();
-    });
-}
-
-function handleFileUpload(files) {
-    if (files.length === 0) return;
-    
-    // Валидация файлов
-    const validFiles = [];
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/heic'];
-    
-    for (let file of files) {
-        if (file.size > maxSize) {
-            alert(`Файл ${file.name} слишком большой. Максимальный размер: 10MB`);
-            continue;
-        }
-        
-        if (!allowedTypes.includes(file.type)) {
-            alert(`Файл ${file.name} имеет неподдерживаемый формат. Разрешены: JPG, PNG, HEIC`);
-            continue;
-        }
-        
-        validFiles.push(file);
+    .couple-names {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: 0.5rem;
     }
     
-    if (validFiles.length === 0) {
-        alert('Не выбрано ни одного подходящего файла');
-        return;
+    .ampersand {
+        font-size: 1.5rem;
     }
     
-    // Симуляция загрузки (в реальном проекте здесь будет отправка на сервер)
-    simulateUpload(validFiles);
-}
-
-function simulateUpload(files) {
-    const uploadArea = document.getElementById('upload-area');
-    const uploadProgress = document.getElementById('upload-progress');
-    const uploadSuccess = document.getElementById('upload-success');
-    const progressFill = document.getElementById('progress-fill');
-    const progressText = document.getElementById('progress-text');
-    
-    // Показываем прогресс
-    uploadArea.style.display = 'none';
-    uploadProgress.style.display = 'block';
-    
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += Math.random() * 15;
-        if (progress > 100) progress = 100;
-        
-        progressFill.style.width = progress + '%';
-        progressText.textContent = `Загружаем фотографии... ${Math.round(progress)}%`;
-        
-        if (progress >= 100) {
-            clearInterval(interval);
-            setTimeout(() => {
-                uploadProgress.style.display = 'none';
-                uploadSuccess.style.display = 'block';
-                
-                // Добавляем фотографии в галерею (демо)
-                addPhotosToGallery(files);
-                
-                // Возвращаем форму через 3 секунды
-                setTimeout(() => {
-                    uploadSuccess.style.display = 'none';
-                    uploadArea.style.display = 'block';
-                    progressFill.style.width = '0%';
-                    document.getElementById('photo-input').value = '';
-                }, 3000);
-            }, 500);
-        }
-    }, 200);
-}
-
-function addPhotosToGallery(files) {
-    const grid = document.getElementById('guest-photos-grid');
-    const placeholder = grid.querySelector('.add-photo-placeholder');
-    
-    // Удаляем placeholder если это первые фото
-    if (placeholder && grid.children.length <= 4) {
-        placeholder.remove();
+    .wedding-date {
+        font-size: 1.2rem;
     }
     
-    // Добавляем новые фотографии (демо - используем URL.createObjectURL)
-    Array.from(files).forEach((file, index) => {
-        setTimeout(() => {
-            const photoItem = document.createElement('div');
-            photoItem.className = 'guest-photo-item';
-            
-            const img = document.createElement('img');
-            img.className = 'guest-photo';
-            img.src = URL.createObjectURL(file);
-            img.alt = 'Фото от гостя';
-            
-            const author = document.createElement('div');
-            author.className = 'photo-author';
-            author.textContent = 'От: Вы';
-            
-            photoItem.appendChild(img);
-            photoItem.appendChild(author);
-            
-            // Добавляем обработчик клика для просмотра
-            photoItem.addEventListener('click', () => openPhotoModal(img.src));
-            
-            grid.appendChild(photoItem);
-            
-            // Анимация появления
-            photoItem.style.opacity = '0';
-            photoItem.style.transform = 'translateY(20px)';
-            setTimeout(() => {
-                photoItem.style.transition = 'all 0.5s ease';
-                photoItem.style.opacity = '1';
-                photoItem.style.transform = 'translateY(0)';
-            }, 100);
-        }, index * 200);
-    });
-}
-
-function initGuestGallery() {
-    // Добавляем обработчики клика для существующих фотографий
-    const existingPhotos = document.querySelectorAll('.guest-photo-item');
-    existingPhotos.forEach(item => {
-        item.addEventListener('click', function() {
-            const img = this.querySelector('.guest-photo');
-            if (img) {
-                openPhotoModal(img.src);
-            }
-        });
-    });
-}
-
-function openPhotoModal(imageSrc) {
-    // Создаем модальное окно для просмотра фотографии
-    const modal = document.createElement('div');
-    modal.className = 'photo-modal';
-    modal.innerHTML = `
-        <div class="photo-modal-content">
-            <span class="photo-modal-close">&times;</span>
-            <img src="${imageSrc}" alt="Фото от гостя" class="modal-photo">
-            <div class="photo-modal-actions">
-                <button onclick="downloadPhoto('${imageSrc}')" class="download-btn">
-                    💾 Скачать
-                </button>
-            </div>
-        </div>
-    `;
+    .section-title {
+        font-size: 2rem;
+    }
     
-    document.body.appendChild(modal);
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    .datetime-grid {
+        grid-template-columns: 1fr;
+    }
     
-    // Обработчики закрытия
-    modal.querySelector('.photo-modal-close').onclick = () => closePhotoModal(modal);
-    modal.onclick = (e) => {
-        if (e.target === modal) closePhotoModal(modal);
-    };
+    .location-content {
+        grid-template-columns: 1fr;
+    }
     
-    // Закрытие по ESC
-    const escHandler = (e) => {
-        if (e.key === 'Escape') {
-            closePhotoModal(modal);
-            document.removeEventListener('keydown', escHandler);
-        }
-    };
-    document.addEventListener('keydown', escHandler);
-}
-
-function closePhotoModal(modal) {
-    modal.style.opacity = '0';
-    setTimeout(() => {
-        modal.remove();
-        document.body.style.overflow = '';
-    }, 300);
-}
-
-function downloadPhoto(imageSrc) {
-    const link = document.createElement('a');
-    link.href = imageSrc;
-    link.download = 'wedding-photo-' + Date.now() + '.jpg';
-    link.click();
-}
-
-
-
-// ===== PERSONALIZED INVITATION MODAL =====
-
-// Function to parse GET parameters from URL
-function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
-
-// Function to show the personalized modal
-function showPersonalizedModal(guestName) {
-    const modal = document.getElementById("personalized-modal");
-    const modalTitle = document.getElementById("personalized-modal-title");
-    const modalText = document.getElementById("personalized-modal-text");
-    const closeBtn = modal.querySelector(".modal-close");
-
-    if (guestName) {
-        modalTitle.textContent = `Дорогие ${guestName}!`;
-        modalText.innerHTML = `Мы с нетерпением ждем Вас на нашей свадьбе! <br>Ваше присутствие для нас очень важно.`;
-    } else {
-        modalTitle.textContent = `Дорогой гость!`;
-        modalText.innerHTML = `Мы с нетерпением ждем Вас на нашей свадьбе! <br>Ваше присутствие для нас очень важно.`;
+    .gifts-content {
+        grid-template-columns: 1fr;
+        text-align: center;
     }
-
-    modal.style.display = "flex";
-    document.body.style.overflow = "hidden"; // Prevent scrolling behind the modal
-
-    const modalButton = modal.querySelector(".modal-button");
-    if (modalButton) {
-        modalButton.onclick = function() {
-            closePersonalizedModal();
-        };
+    
+    .gifts-icon {
+        font-size: 4rem;
     }
-
-    // Close modal when clicking on the close button
-    closeBtn.onclick = function() {
-        closePersonalizedModal();
+    
+    .rsvp-form {
+        padding: 2rem;
     }
-
-    // Close modal when clicking outside of the modal content
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            closePersonalizedModal();
-        }
+    
+    .radio-group {
+        gap: 0.5rem;
     }
-
-    // Close modal when pressing the Escape key
-    document.addEventListener("keydown", function(event) {
-        if (event.key === "Escape") {
-            closePersonalizedModal();
-        }
-    });
 }
 
-// Function to close the personalized modal
-function closePersonalizedModal() {
-    const modal = document.getElementById("personalized-modal");
-    modal.style.display = "none";
-    document.body.style.overflow = "auto"; // Restore scrolling
+@media (max-width: 480px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .couple-names {
+        font-size: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+    }
+    
+    .datetime-item,
+    .location-item {
+        padding: 1.5rem;
+    }
+    
+    .reception-info {
+        padding: 2rem;
+    }
+    
+    .rsvp-form {
+        padding: 1.5rem;
+    }
 }
 
-// Check for guest parameter on page load
-document.addEventListener("DOMContentLoaded", function() {
-    const guestName = getQueryParam("guest");
-    if (guestName) {
-        showPersonalizedModal(decodeURIComponent(guestName));
+
+/* ===== PHOTO GALLERY STYLES ===== */
+.photo-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.photo-item {
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.photo-item.reveal {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.about-photo {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-photo:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.photo-caption {
+    margin-top: 1rem;
+    font-style: italic;
+    color: #8b7355;
+    font-size: 0.9rem;
+}
+
+/* ===== HERO IMAGE STYLES ===== */
+.hero-image {
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: scale(0.8);
+    animation: heroImageAppear 1s ease 0.5s forwards;
+}
+
+.couple-photo {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes heroImageAppear {
+    to {
+        opacity: 1;
+        transform: scale(1);
     }
-});
+}
+
+/* ===== RESPONSIVE UPDATES ===== */
+@media (max-width: 768px) {
+    .photo-gallery {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .about-photo {
+        height: 250px;
+    }
+    
+    .couple-photo {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .hero-image {
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-photo {
+        height: 200px;
+    }
+    
+    .couple-photo {
+        width: 120px;
+        height: 120px;
+    }
+}
 
 
+/* ===== PROGRAM SECTION STYLES ===== */
+.program-section {
+    
+    padding: 5rem 0;
+}
+
+.program-timeline {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.program-timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.3); /* Убираем градиент, оставляем только полупрозрачную линию */
+    transform: translateX(-50%);
+}
+
+.timeline-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3rem;
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.timeline-item.reveal {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.timeline-item:nth-child(odd) {
+    flex-direction: row;
+}
+
+.timeline-item:nth-child(even) {
+    flex-direction: row-reverse;
+}
+
+.timeline-time {
+    background: rgba(255, 255, 255, 0.8); /* Убираем цвет, оставляем полупрозрачный белый */
+    color: #4a4a4a; /* Меняем цвет текста на темный */
+    padding: 1rem 1.5rem;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    min-width: 100px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(10px); /* Добавляем эффект размытия */
+}
+
+.timeline-content {
+    background: rgba(255, 255, 255, 0.9); /* Делаем фон полупрозрачным */
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin: 0 2rem;
+    flex: 1;
+    max-width: 300px;
+    backdrop-filter: blur(10px); /* Добавляем эффект размытия */
+}
+
+.timeline-content h3 {
+    color: #4a4a4a;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.timeline-content p {
+    color: #6b6b6b;
+    margin: 0;
+}
+
+/* ===== MEMORIES SECTION STYLES ===== */
+.memories-section {
+    background: #fff;
+    padding: 5rem 0;
+}
+
+.memories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.memory-item {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.memory-item.reveal {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.memory-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.memory-photo {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.memory-item:hover .memory-photo {
+    transform: scale(1.05);
+}
+
+.memory-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    color: white;
+    padding: 2rem 1.5rem 1.5rem;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+
+.memory-item:hover .memory-overlay {
+    transform: translateY(0);
+}
+
+.memory-overlay h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+}
+
+.memory-overlay p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* ===== MODAL IMPROVEMENTS ===== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    animation: modalFadeIn 0.3s ease;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    animation: modalSlideIn 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s ease;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ===== RESPONSIVE UPDATES ===== */
+@media (max-width: 768px) {
+    .program-timeline::before {
+        left: 30px;
+    }
+    
+    .timeline-item,
+    .timeline-item:nth-child(even) {
+        flex-direction: row;
+        padding-left: 60px;
+        margin-bottom: 4rem; /* Увеличиваем отступ между элементами */
+    }
+    
+    .timeline-time {
+        position: absolute;
+        left: 0;
+        min-width: 80px;
+        padding: 0.8rem 1rem;
+        font-size: 1rem;
+    }
+    
+    .timeline-content {
+        margin: 0;
+        max-width: none;
+        margin-left: 1rem; /* Добавляем отступ слева */
+    }
+    
+    .memories-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .memory-photo {
+        height: 250px;
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .program-section {
+        padding: 3rem 0;
+    }
+    
+    .memories-section {
+        padding: 3rem 0;
+    }
+    
+    .timeline-item,
+    .timeline-item:nth-child(even) {
+        margin-bottom: 5rem; /* Еще больше увеличиваем отступ для маленьких экранов */
+        padding-left: 70px; /* Увеличиваем отступ слева */
+    }
+    
+    .timeline-content {
+        padding: 1.5rem;
+        margin-left: 1.5rem; /* Увеличиваем отступ слева */
+    }
+    
+    .memory-photo {
+        height: 200px;
+    }
+}
+
+
+/* ===== COUNTDOWN TIMER STYLES ===== */
+.countdown-container {
+    margin: 30px 0;
+    text-align: center;
+}
+
+.countdown-timer {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.countdown-item {
+    border-radius: var(--border-radius);
+    padding: 15px 10px;
+    min-width: 80px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.countdown-number {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-brown);
+    line-height: 1;
+}
+
+.countdown-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+.countdown-message {
+    font-size: 1.1rem;
+    color: var(--white);
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.calendar-reminder {
+    margin-top: 20px;
+}
+
+.calendar-btn {
+    background: linear-gradient(135deg, var(--accent-brown), #c19a6b);
+    color: var(--white);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 5px 15px rgba(210, 180, 140, 0.3);
+}
+
+.calendar-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(210, 180, 140, 0.4);
+}
+
+@media (max-width: 768px) {
+    .countdown-timer {
+        gap: 10px;
+    }
+    
+    .countdown-item {
+        min-width: 70px;
+        padding: 12px 8px;
+    }
+    
+    .countdown-number {
+        font-size: 1.5rem;
+    }
+    
+    .countdown-label {
+        font-size: 0.8rem;
+    }
+}
+
+
+/* ===== CALENDAR MODAL STYLES ===== */
+.calendar-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.calendar-modal-content {
+    background: var(--white);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.calendar-modal-content h3 {
+    font-family: var(--font-heading);
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.calendar-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.calendar-option {
+    display: block;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, var(--light-pink), var(--lavender));
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.calendar-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.close-modal {
+    background: var(--accent-brown);
+    color: var(--white);
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.close-modal:hover {
+    background: #c19a6b;
+}
+
+.countdown-finished {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--accent-brown);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+
+/* ===== DRESS CODE SECTION STYLES ===== */
+.dresscode-section {
+    padding: var(--section-padding);
+    background: linear-gradient(135deg, var(--light-pink), var(--lavender));
+}
+
+.dresscode-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.dresscode-main {
+    margin-bottom: 50px;
+}
+
+.dresscode-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.dresscode-main h3 {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+}
+
+.dresscode-description {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    line-height: 1.8;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.dresscode-tips {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.dresscode-tip {
+    
+    padding: 30px 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 1.5);
+    transition: var(--transition);
+}
+
+.dresscode-tip:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 1.1);
+}
+
+.tip-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.tip-content h4 {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+.tip-content p {
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+/* ===== FAQ SECTION STYLES ===== */
+.faq-section {
+    padding: var(--section-padding);
+    background: var(--white);
+}
+
+.faq-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faq-item {
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.faq-item:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 1.5);
+}
+
+.faq-question {
+    background: linear-gradient(135deg, var(--light-pink), var(--lavender));
+    padding: 20px 25px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+}
+
+.faq-question h3 {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    margin: 0;
+    flex: 1;
+}
+
+.faq-toggle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-brown);
+    transition: var(--transition);
+    min-width: 30px;
+    text-align: center;
+}
+
+.faq-answer {
+    padding: 0 25px;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: var(--white);
+}
+
+.faq-answer.active {
+    padding: 20px 25px;
+    max-height: 200px;
+}
+
+.faq-answer p {
+    color: var(--text-light);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.faq-item.active .faq-toggle {
+    transform: rotate(45deg);
+}
+
+@media (max-width: 768px) {
+    .dresscode-tips {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .dresscode-main h3 {
+        font-size: 2rem;
+    }
+    
+    .dresscode-description {
+        font-size: 1.1rem;
+    }
+    
+    .faq-question {
+        padding: 15px 20px;
+    }
+    
+    .faq-question h3 {
+        font-size: 1.1rem;
+    }
+    
+    .faq-answer.active {
+        padding: 15px 20px;
+    }
+}
+
+
+/* ===== WEATHER SECTION STYLES ===== */
+.weather-section {
+    padding: var(--section-padding);
+    background: linear-gradient(135deg, var(--light-blue), var(--white));
+}
+
+.weather-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.weather-intro {
+    margin-bottom: 40px;
+}
+
+.weather-intro p {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+.weather-widget {
+    
+    border-radius: var(--border-radius);
+    padding: 40px 30px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 1.5);
+    margin-bottom: 40px;
+    backdrop-filter: blur(10px);
+}
+
+.weather-loading {
+    text-align: center;
+}
+
+.weather-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--accent-brown);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.weather-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.weather-icon {
+    font-size: 4rem;
+}
+
+.weather-temp {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent-brown);
+}
+
+.weather-desc {
+    font-size: 1.3rem;
+    color: var(--text-dark);
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.weather-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.weather-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: rgba(230, 243, 255, 0.5);
+    border-radius: 8px;
+}
+
+.detail-label {
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.detail-value {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.weather-recommendation {
+    background: linear-gradient(135deg, var(--light-pink), var(--lavender));
+    padding: 20px;
+    border-radius: var(--border-radius);
+    text-align: left;
+}
+
+.weather-recommendation h4 {
+    font-family: var(--font-heading);
+    color: var(--text-dark);
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.weather-recommendation p {
+    color: var(--text-light);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.weather-error {
+    text-align: center;
+    color: var(--text-light);
+}
+
+.weather-link {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: var(--accent-brown);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.weather-link:hover {
+    background: #c19a6b;
+    transform: translateY(-2px);
+}
+
+.weather-tips {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.weather-tip {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: var(--transition);
+}
+
+.weather-tip:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.weather-tip .tip-icon {
+    font-size: 2rem;
+    min-width: 50px;
+}
+
+.weather-tip .tip-text h4 {
+    font-family: var(--font-heading);
+    color: var(--text-dark);
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.weather-tip .tip-text p {
+    color: var(--text-light);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .weather-widget {
+        padding: 30px 20px;
+    }
+    
+    .weather-main {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .weather-temp {
+        font-size: 2.5rem;
+    }
+    
+    .weather-details {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .weather-tips {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .weather-tip {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+
+/* ===== GUEST PHOTOS SECTION STYLES ===== */
+.guest-photos-section {
+    padding: var(--section-padding);
+    background: linear-gradient(135deg, var(--lavender), var(--light-pink));
+}
+
+.guest-photos-content {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.upload-intro {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.upload-intro p {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.photo-upload-widget {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: var(--border-radius);
+    padding: 40px 30px;
+    margin-bottom: 50px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.upload-area {
+    text-align: center;
+    padding: 40px 20px;
+    border: 3px dashed var(--accent-brown);
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    border-color: #c19a6b;
+    background: rgba(210, 180, 140, 0.05);
+}
+
+.upload-area.dragover {
+    border-color: #c19a6b;
+    background: rgba(210, 180, 140, 0.1);
+    transform: scale(1.02);
+}
+
+.upload-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.upload-area h3 {
+    font-family: var(--font-heading);
+    color: var(--text-dark);
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.upload-area p {
+    color: var(--text-light);
+    margin-bottom: 20px;
+}
+
+.upload-btn {
+    background: linear-gradient(135deg, var(--accent-brown), #c19a6b);
+    color: var(--white);
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 5px 15px rgba(210, 180, 140, 0.3);
+}
+
+.upload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(210, 180, 140, 0.4);
+}
+
+.upload-progress {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-brown), #c19a6b);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.upload-success {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.success-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.upload-success h3 {
+    font-family: var(--font-heading);
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+.upload-success p {
+    color: var(--text-light);
+}
+
+.guest-gallery {
+    margin-bottom: 40px;
+}
+
+.guest-gallery h3 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--text-dark);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.guest-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.guest-photo-item {
+    position: relative;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.guest-photo-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.guest-photo {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.guest-photo-item:hover .guest-photo {
+    transform: scale(1.05);
+}
+
+.photo-author {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: var(--white);
+    padding: 15px 10px 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.add-photo-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px dashed var(--accent-brown);
+    border-radius: var(--border-radius);
+    text-align: center;
+    color: var(--text-light);
+}
+
+.placeholder-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    opacity: 0.7;
+}
+
+.add-photo-placeholder p {
+    margin: 0;
+    font-style: italic;
+}
+
+.photo-guidelines {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.photo-guidelines h4 {
+    font-family: var(--font-heading);
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.photo-guidelines ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.photo-guidelines li {
+    padding: 8px 0;
+    color: var(--text-light);
+    position: relative;
+    padding-left: 25px;
+}
+
+.photo-guidelines li:before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--accent-brown);
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .photo-upload-widget {
+        padding: 30px 20px;
+    }
+    
+    .upload-area {
+        padding: 30px 15px;
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+    }
+    
+    .guest-photos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .guest-photo {
+        height: 150px;
+    }
+    
+    .add-photo-placeholder {
+        height: 150px;
+    }
+}
+
+
+/* ===== PHOTO MODAL STYLES ===== */
+.photo-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.photo-modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    text-align: center;
+}
+
+.photo-modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: var(--white);
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 10001;
+    transition: var(--transition);
+}
+
+.photo-modal-close:hover {
+    color: var(--accent-brown);
+    transform: scale(1.1);
+}
+
+.modal-photo {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: var(--border-radius);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.photo-modal-actions {
+    margin-top: 20px;
+}
+
+.download-btn {
+    background: var(--accent-brown);
+    color: var(--white);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 5px 15px rgba(210, 180, 140, 0.3);
+}
+
+.download-btn:hover {
+    background: #c19a6b;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(210, 180, 140, 0.4);
+}
+
+@media (max-width: 768px) {
+    .photo-modal-content {
+        max-width: 95%;
+        max-height: 95%;
+    }
+    
+    .photo-modal-close {
+        top: -30px;
+        font-size: 1.5rem;
+    }
+    
+    .modal-photo {
+        max-height: 70vh;
+    }
+}
+
+
+
+
+
+#personalized-modal .modal-content {
+    background-color: var(--primary-beige); /* Используем основной бежевый цвет сайта */
+    margin: 10% auto; /* 10% from the top and centered */
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    position: relative;
+    max-width: 500px;
+    text-align: center;
+    animation: slideIn 0.4s ease-out;
+    border: 1px solid var(--accent-brown);
+}
+
+#personalized-modal .modal-close {
+    color: #aaa;
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#personalized-modal .modal-close:hover,
+#personalized-modal .modal-close:focus {
+    color: var(--accent-brown);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#personalized-modal-title {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    color: var(--accent-brown);
+    margin-bottom: 15px; /* Уменьшаем отступ */
+}
+
+#personalized-modal-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-dark);
+    margin-bottom: 10px; /* Уменьшаем отступ */
+}
+
+.modal-additional-text {
+    font-size: 1rem;
+    color: var(--text-light);
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.modal-button {
+    background: linear-gradient(135deg, var(--accent-brown), var(--light-pink));
+    color: var(--white);
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.modal-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    #personalized-modal .modal-content {
+        margin: 20% auto;
+        padding: 30px;
+    }
+    #personalized-modal-title {
+        font-size: 1.8rem;
+    }
+    #personalized-modal-text {
+        font-size: 1rem;
+    }
+}
