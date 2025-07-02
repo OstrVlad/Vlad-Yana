@@ -1031,7 +1031,7 @@ function showPersonalizedModal(guestName) {
     const closeBtn = modal.querySelector(".modal-close");
 
     if (guestName) {
-        modalTitle.textContent = `Дорогой(ая) ${guestName}!`;
+        modalTitle.textContent = `Дорогоие ${guestName}!`;
         modalText.innerHTML = `Мы с нетерпением ждем Вас на нашей свадьбе! <br>Ваше присутствие для нас очень важно.`;
     } else {
         modalTitle.textContent = `Дорогой гость!`;
