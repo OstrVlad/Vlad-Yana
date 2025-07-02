@@ -1031,7 +1031,7 @@ function showPersonalizedModal(guestName) {
     const closeBtn = modal.querySelector(".modal-close");
 
     if (guestName) {
-        modalTitle.textContent = `Дорогие ${guestName}!`;
+        modalTitle.textContent = `Дорогой(ая) ${guestName}!`;
         modalText.innerHTML = `Мы с нетерпением ждем Вас на нашей свадьбе! <br>Ваше присутствие для нас очень важно.`;
     } else {
         modalTitle.textContent = `Дорогой гость!`;
@@ -1040,6 +1040,13 @@ function showPersonalizedModal(guestName) {
 
     modal.style.display = "flex";
     document.body.style.overflow = "hidden"; // Prevent scrolling behind the modal
+
+    const modalButton = modal.querySelector(".modal-button");
+    if (modalButton) {
+        modalButton.onclick = function() {
+            closePersonalizedModal();
+        };
+    }
 
     // Close modal when clicking on the close button
     closeBtn.onclick = function() {
