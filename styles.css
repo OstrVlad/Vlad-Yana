@@ -14,7 +14,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('/white_flowing_fabric.png') center/cover no-repeat;
+    background: url('/Vlad-Yana/white_flowing_fabric.png') center/cover no-repeat;
     background-size: cover;
     opacity: 0.7; /* Увеличиваем прозрачность для максимальной выразительности */
     z-index: -1;
