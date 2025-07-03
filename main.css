@@ -1,53 +1,928 @@
 body {
-  font-family: 'Open Sans', sans-serif;
-  line-height: 1.6;
-  color: #4a4a4a;
-  background-color: #ffffff; /* Чисто белый фон */
-  overflow-x: hidden;
-  position: relative;
+    font-family: 'Open Sans', sans-serif;
+    line-height: 1.6;
+    color: #4a4a4a;
+    background-color: #ffffff; /* Чисто белый фон */
+    overflow-x: hidden;
+    position: relative;
 }
 
 body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url("./white_flowing_fabric.png") center/cover no-repeat;
-  background-size: cover;
-  opacity: 0.7; /* Увеличиваем прозрачность для максимальной выразительности */
-  z-index: -1;
-  animation: fabricFlow 8s ease-in-out infinite; /* Ускоряем анимацию */
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("/Vlad-Yana/white_flowing_fabric.png") center/cover no-repeat;
+    background-size: cover;
+    opacity: 0.7; /* Увеличиваем прозрачность для максимальной выразительности */
+    z-index: -1;
+    animation: fabricFlow 8s ease-in-out infinite; /* Ускоряем анимацию */
 }
 
 @keyframes flowingFabric {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 @keyframes fabricFlow {
-  0%, 100% {
-    transform: translateX(0) translateY(0) scale(1);
-    opacity: 0.7;
-  }
-  25% {
-    transform: translateX(-30px) translateY(-20px) scale(1.08); /* Увеличиваем движение и масштаб */
-    opacity: 0.8;
-  }
-  50% {
-    transform: translateX(30px) translateY(20px) scale(1.07);
-    opacity: 0.75;
-  }
-  75% {
-    transform: translateX(-20px) translateY(30px) scale(1.09);
-  }
+    0%, 100% {
+        transform: translateX(0) translateY(0) scale(1);
+        opacity: 0.7;
+    }
+    25% {
+        transform: translateX(-30px) translateY(-20px) scale(1.08); /* Увеличиваем движение и масштаб */
+        opacity: 0.8;
+    }
+    50% {
+        transform: translateX(30px) translateY(20px) scale(1.07);
+        opacity: 0.75;
+    }
+    75% {
+        transform: translateX(-20px) translateY(30px) scale(1.09);
+    }
+}
+
+/* Остальной ваш CSS код */
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    overflow: hidden;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Затемнение для лучшей читаемости текста */
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 20px;
+}
+
+.couple-names {
+    font-family: 'Playfair Display', serif;
+    font-size: 4em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.couple-names .ampersand {
+    font-size: 0.8em;
+    vertical-align: middle;
+}
+
+.wedding-date {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.5em;
+    margin-bottom: 30px;
+}
+
+/* Countdown Timer */
+.countdown-container {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.countdown-timer {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.countdown-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5em;
+    font-weight: bold;
+}
+
+.countdown-label {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.8em;
+    text-transform: uppercase;
+}
+
+.countdown-message {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+
+.calendar-reminder {
+    margin-top: 20px;
+}
+
+.calendar-btn {
+    background-color: #a77b62; /* Теплый, землистый цвет */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.calendar-btn:hover {
+    background-color: #8e6551;
+}
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+
+.scroll-arrow {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #fff;
+    animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+/* General Section Styling */
+section {
+    padding: 60px 0;
+    text-align: center;
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5em;
+    margin-bottom: 40px;
+    color: #333;
+}
+
+/* Date & Time Section */
+.datetime-section {
+    background-color: #f9f9f9;
+}
+
+.datetime-elegant-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-top: 30px;
+}
+
+.datetime-header {
+    margin-bottom: 30px;
+}
+
+.date-display {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2em;
+    color: #a77b62;
+}
+
+.date-display .date-number {
+    font-weight: bold;
+}
+
+.date-display .date-month,
+.date-display .date-year {
+    font-size: 0.8em;
+    display: block;
+}
+
+.datetime-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    padding-left: 20px;
+    border-left: 2px solid #e0e0e0;
+}
+
+.timeline-event {
+    display: flex;
+    align-items: center;
+    text-align: left;
+}
+
+.event-time {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #a77b62;
+    min-width: 80px;
+    text-align: right;
+    margin-right: 20px;
+}
+
+.event-details h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4em;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.event-details p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9em;
+    color: #666;
+    line-height: 1.4;
+}
+
+.event-icon {
+    font-size: 1.8em;
+    margin-left: 20px;
+}
+
+.datetime-footer {
+    margin-top: 30px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.dress-code-note strong {
+    color: #a77b62;
+}
+
+/* Reception Section */
+.reception-section {
+    position: relative;
+    background: url("/Vlad-Yana/white_flowing_fabric.png") center/cover no-repeat; /* Используем то же изображение для фона */
+    color: #fff;
+    padding: 80px 0;
+}
+
+.reception-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Затемнение */
+    z-index: 1;
+}
+
+.reception-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+.reception-content {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 30px;
+}
+
+.reception-info .reception-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+.reception-info h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.reception-info p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.1em;
+    line-height: 1.5;
+}
+
+.reception-time {
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+/* Location Section */
+.location-section {
+    background-color: #f9f9f9;
+}
+
+.location-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.location-item {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    flex: 1;
+    min-width: 280px;
+    text-align: left;
+}
+
+.location-item h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5em;
+    color: #a77b62;
+    margin-bottom: 10px;
+}
+
+.location-item p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.95em;
+    color: #666;
+    line-height: 1.4;
+}
+
+.map-container {
+    flex: 2;
+    min-width: 300px;
+    height: 400px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+}
+
+.map-placeholder {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.1em;
+}
+
+/* Program Section */
+.program-section {
+    background-color: #fff;
+}
+
+.program-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    padding-left: 20px;
+    border-left: 2px solid #e0e0e0;
+    margin-top: 30px;
+}
+
+.program-timeline .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.program-timeline .timeline-time {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #a77b62;
+    min-width: 80px;
+    text-align: right;
+    margin-right: 20px;
+}
+
+.program-timeline .timeline-content h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4em;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.program-timeline .timeline-content p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9em;
+    color: #666;
+    line-height: 1.4;
+}
+
+/* Dress Code Section */
+.dresscode-section {
+    background-color: #f9f9f9;
+}
+
+.dresscode-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.dresscode-main {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    flex: 1;
+    min-width: 300px;
+}
+
+.dresscode-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+    color: #a77b62;
+}
+
+.dresscode-main h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.dresscode-description {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.1em;
+    color: #666;
+    line-height: 1.5;
+}
+
+.dresscode-tips {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.dresscode-tip {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.tip-icon {
+    font-size: 2em;
+    color: #a77b62;
+}
+
+.tip-content h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2em;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.tip-content p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Weather Section */
+.weather-section {
+    background-color: #fff;
+}
+
+.weather-content {
+    margin-top: 30px;
+}
+
+.weather-intro p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.1em;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.weather-widget {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    display: inline-block;
+    text-align: center;
+}
+
+.weather-loading,
+.weather-error {
+    font-family: 'Open Sans', sans-serif;
+    color: #888;
+}
+
+.weather-spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #a77b62;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.weather-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.weather-main {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.weather-icon {
+    font-size: 3em;
+}
+
+.weather-temp {
+    font-family: 'Playfair Display', serif;
+    font-size: 3em;
+    font-weight: bold;
+    color: #a77b62;
+}
+
+.weather-desc {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.2em;
+    color: #666;
+}
+
+.weather-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.weather-detail {
+    text-align: left;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.detail-label {
+    font-weight: bold;
+}
+
+.weather-recommendation {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.95em;
+    color: #666;
+    line-height: 1.4;
+}
+
+.weather-link {
+    display: inline-block;
+    margin-top: 15px;
+    color: #a77b62;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.weather-link:hover {
+    text-decoration: underline;
+}
+
+/* FAQ Section */
+.faq-section {
+    background-color: #f9f9f9;
+}
+
+.faq-content {
+    margin-top: 30px;
+    text-align: left;
+}
+
+.faq-item {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    cursor: pointer;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2em;
+    color: #333;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #eee;
+}
+
+.faq-question:hover {
+    background-color: #eee;
+}
+
+.faq-toggle {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #a77b62;
+}
+
+.faq-answer {
+    padding: 0 20px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    font-family: 'Open Sans', sans-serif;
+    color: #666;
+    line-height: 1.5;
+}
+
+.faq-answer p {
+    padding-bottom: 20px;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 200px; /* Adjust as needed */
+}
+
+.faq-item.active .faq-question {
+    border-bottom: none;
+}
+
+.faq-item.active .faq-toggle {
+    transform: rotate(45deg);
+}
+
+/* Gifts Section */
+.gifts-section {
+    background-color: #fff;
+}
+
+.gifts-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.gifts-text p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.1em;
+    color: #666;
+    line-height: 1.5;
+    max-width: 600px;
+}
+
+.gifts-icon {
+    font-size: 3em;
+    color: #a77b62;
+}
+
+/* Footer */
+.footer {
+    background-color: #333;
+    color: #fff;
+    padding: 40px 0;
+    text-align: center;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-names h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8em;
+    margin-bottom: 10px;
+}
+
+.footer-contacts p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.9em;
+    line-height: 1.6;
+}
+
+.footer-copyright p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.8em;
+    color: #aaa;
+}
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    max-width: 500px;
+    text-align: center;
+    position: relative;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-close {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-content h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2em;
+    color: #a77b62;
+    margin-bottom: 15px;
+}
+
+.modal-content p {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.1em;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.modal-additional-text {
+    font-size: 0.9em;
+    color: #888;
+    margin-top: -10px;
+    margin-bottom: 25px;
+}
+
+.modal-button {
+    background-color: #a77b62;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.modal-button:hover {
+    background-color: #8e6551;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .couple-names {
+        font-size: 3em;
+        gap: 10px;
+    }
+
+    .wedding-date {
+        font-size: 1.2em;
+    }
+
+    .countdown-timer {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .countdown-number {
+        font-size: 2em;
+    }
+
+    .section-title {
+        font-size: 2em;
+    }
+
+    .datetime-timeline,
+    .program-timeline {
+        padding-left: 0;
+        border-left: none;
+    }
+
+    .timeline-event,
+    .program-timeline .timeline-item {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: center;
+    }
+
+    .event-time,
+    .program-timeline .timeline-time {
+        text-align: center;
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .event-icon {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    .location-content,
+    .dresscode-content {
+        flex-direction: column;
+    }
+
+    .map-container {
+        height: 300px;
+    }
+
+    .weather-main {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .weather-temp {
+        font-size: 2.5em;
+    }
+
+    .weather-details {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-content {
+        align-items: center;
+    }
 }
 
