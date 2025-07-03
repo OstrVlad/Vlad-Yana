@@ -2316,5 +2316,59 @@ body::before {
         font-size: 1rem;
     }
 }
+/* Стили для кнопки с нежно-розовым фоном в модальном окне */
+
+/* Основные стили для кнопки RSVP в модальном окне */
+.modal-content button,
+.modal button {
+    background: #f8bbd9 !important; /* Нежно-розовый фон */
+    color: #8b5a6b !important; /* Темно-розовый текст для контраста */
+    border: 2px solid #e91e63 !important; /* Розовая рамка */
+    padding: 12px 30px !important;
+    font-size: 1.1em !important;
+    font-weight: bold !important;
+    border-radius: 25px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    margin-top: 20px !important;
+    min-width: 150px !important;
+    text-shadow: none !important; /* Убираем тень текста */
+}
+
+.modal-content button:hover,
+.modal button:hover {
+    background: #f48fb1 !important; /* Более насыщенный розовый при наведении */
+    color: #6d4c57 !important; /* Темнее текст при наведении */
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3) !important; /* Розовая тень */
+}
+
+/* Альтернативный вариант - более яркий розовый */
+.modal-content button.bright-pink,
+.modal button.bright-pink {
+    background: #ff69b4 !important; /* Ярко-розовый фон */
+    color: white !important; /* Белый текст */
+    border: 2px solid #e91e63 !important;
+}
+
+.modal-content button.bright-pink:hover,
+.modal button.bright-pink:hover {
+    background: #e91e63 !important;
+    color: white !important;
+}
+
+/* Вариант с прозрачным фоном и розовым текстом */
+.modal-content button.transparent-pink,
+.modal button.transparent-pink {
+    background: transparent !important;
+    color: #e91e63 !important; /* Розовый текст */
+    border: 2px solid #e91e63 !important;
+}
+
+.modal-content button.transparent-pink:hover,
+.modal button.transparent-pink:hover {
+    background: #f8bbd9 !important; /* Нежно-розовый фон при наведении */
+    color: #8b5a6b !important;
+}
 
 
