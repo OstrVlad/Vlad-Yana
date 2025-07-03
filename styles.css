@@ -345,7 +345,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('/white_flowing_fabric.png') center/cover no-repeat;
+     background: url('/Vlad-Yana/white_flowing_fabric.png') center/cover no-repeat;
     opacity: 0.1;
     animation: fabricFlow 20s ease-in-out infinite;
 }
